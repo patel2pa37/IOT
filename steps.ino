@@ -1,4 +1,6 @@
 #include <SPI.h>
+#define Xbee Serial1
+
 int csPin=7;
 
 void setupADXL(int _CS_PIN)
@@ -10,12 +12,14 @@ void setupADXL(int _CS_PIN)
   //***Step #1***
   //call SPI.begin() to initialize the SPI interface
   SPI.begin();
+  Xbee.begin(9600);
   
   //***Step #2***
   //use SPI.setDataMode() to select the appropriate SPI mode for operations. 
   //See: https://www.arduino.cc/en/Reference/SPISetDataMode and the lecture notes
   SPI.setDataMode(SPI_MODE3);
-  
+  Serial.begin(9600);
+
   //***Step #3 (Optional) ***
   //write to the DATA_FORMAT register to adjust the sampling range
   
@@ -29,7 +33,7 @@ void setupADXL(int _CS_PIN)
   //back the new register value.
    pinMode(csPin, OUTPUT);
   digitalWrite(csPin,HIGH);
-  writeRegister(0x31, 0x01);//4g
+  writeRegister(0x31, 0x00);//4g
   writeRegister(0x2D, 0x08);
   
 }
@@ -150,10 +154,24 @@ void loop() {
   //read z-axis
   int16_t zAxis=getZAcceleteration();
 
+  //Serial.print(xAxis); Serial.print(",");Serial.print(yAxis); Serial.print(",");Serial.println(zAxis);
+  Serial.print(xAxis, DEC);
+  Serial.print(',');
+  Serial.print(yAxis, DEC);
+  Serial.print(',');
+  Serial.println(zAxis, DEC); 
+  
+  int SQRTvalues = (sqrt(xAxis*xAxis+yAxis*yAxis+zAxis*zAxis));
+  //Serial.println(SQRTvalues);
+  String str = (String(xAxis)+"//"+String(yAxis)+"//"+String(zAxis));
+  //Xbee.println(xAxis);
+  //Xbee.println(yAxis);
+  Xbee.println(str);
+  delay(100);
   //your Arduino will hate this but we need to test....
-  int magnitude = sqrt(xAxis*xAxis + yAxis*yAxis + zAxis*zAxis);
+  //int magnitude = sqrt(xAxis*xAxis + yAxis*yAxis + zAxis*zAxis);
   //Serial.println(magnitude);
   //result should be ~1g when ADXL345 is not moving
-  float acceleration = convertRawToFloat(magnitude);
-  Serial.println(acceleration);
+  //float acceleration = convertRawToFloat(magnitude);
+  //Serial.println(acceleration);
 }
