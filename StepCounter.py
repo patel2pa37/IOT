@@ -51,13 +51,19 @@ def get_Data():
                 pass
     '''
     lineData = []
-    while abs(currentTime-startTime)<0:
-        bytes = ser.readline()
-        line = bytes.decode('utf-8')
-        line = line.replace('\r','').replace('\n','')
-        print(line)
-        lineData.append(line)
-        currentTime=int(time.time())
+    try:
+        while True:
+            k = cv2.waitKey(1) and 0xFF
+            if k == ord('q'):
+                s = False
+            bytes = ser.readline()
+            line = bytes.decode('utf-8')
+            line = line.replace('\r','').replace('\n','')
+            print(line)
+            lineData.append(line)
+            currentTime=int(time.time())
+    except KeyboardInterrupt:
+        pass
     x = []
     for d in lineData:
         if len(d)>5:
@@ -70,8 +76,6 @@ def get_Data():
         except Exception:
             pass
 
-    plt.plot(x_1)
-    plt.show()
     arr = np.array(x_1)
     np.savetxt('array3.csv', [arr],delimiter=',',fmt='%d')
     
@@ -176,7 +180,7 @@ arr_1 = [255,253,255,262,253,252,252,250,262,258,254,258,252,256,258,253,252,252
 #GetData = getData('48_steps.csv')
 GetData = get_Data()
 GetStartAndStop, standerDV, meanSD = StartingandStopingPointFinder(GetData)
-GetSlop = getSlop(gaussian_filter1d(GetStartAndStop, sigma = 4))
+GetSlop = getSlop(gaussian_filter1d(GetStartAndStop, sigma = 3))
 GetCount = CountTheOnes(GetSlop)
 print('steps count is:', GetCount)
 
@@ -184,4 +188,5 @@ print('steps count is:', GetCount)
 #plt.plot(x_1)
 #plt.plot(GetSlop)
 #plt.show()
+
 
