@@ -53,9 +53,6 @@ def get_Data():
     lineData = []
     try:
         while True:
-            k = cv2.waitKey(1) and 0xFF
-            if k == ord('q'):
-                s = False
             bytes = ser.readline()
             line = bytes.decode('utf-8')
             line = line.replace('\r','').replace('\n','')
